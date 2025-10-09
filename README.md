@@ -137,3 +137,7 @@ This project is designed to be modular and extensible.
 ## Contributing
 
 Developers are more than welcome to help develop this into a more robust and advanced system. Feel free to fork the project, create feature branches, and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
+
+## Notice
+
+The Reactive Jammer is a brilliant concept — I don't yet have the two HackRFs needed to test it, so it may have issues. I'll be spending more time building the system; for now let's class it as a prototype. If anyone is interested in helping develop this into a real-world, lab-safe application or wants to collaborate, please feel free to reach out. (Note: this work is intended for controlled, legal research/testing only.)
