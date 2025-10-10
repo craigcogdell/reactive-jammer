@@ -1,3 +1,21 @@
+<!-- Hero image section -->
+<p align="center">
+  <img src="hero.jpg" alt="Reactive Jammer Hero" width="100%" style="max-height:360px; object-fit:cover;">
+</p>
+
+<h1 align="center">Reactive Jammer</h1>
+
+<p align="center">
+  <em>Reactive Jammer using two HackRF SDR radios with a GUI interface</em>
+</p>
+
+<p align="center">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg">
+  <img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-green.svg">
+  <img alt="Status" src="https://img.shields.io/badge/status-Active-success.svg">
+</p>
+
+
 # Reactive Jammer System
 
 <pre>
