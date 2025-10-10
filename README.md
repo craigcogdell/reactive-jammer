@@ -1,6 +1,6 @@
 <!-- Hero image section -->
 <p align="center">
-  <img src="./static/hero.jpg" alt="Reactive Jammer Hero" width="100%" style="max-height:360px; object-fit:cover;">
+  <img src="./static/hero.png" alt="Reactive Jammer Hero" width="100%" style="max-height:360px; object-fit:cover;">
 </p>
 
 <h1 align="center">Reactive Jammer</h1>
