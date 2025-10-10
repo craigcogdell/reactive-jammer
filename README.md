@@ -160,4 +160,4 @@ Developers are more than welcome to help develop this into a more robust and adv
 
 The Reactive Jammer is a brilliant concept — I don't yet have the two HackRFs needed to test it, so it may have issues. I'll be spending more time building the system; for now let's class it as a prototype. If anyone is interested in helping develop this into a real-world, lab-safe application or wants to collaborate, please feel free to reach out. (Note: this work is intended for controlled, legal research/testing only.)
 
-<p align="center"> <a href="buymeacoffee.com/craigcogdey" target="_blank"> <img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20drink&emoji=🍺&slug=YOURUSERNAME&button_colour=FFDD00&font_colour=000000&font_family=Poppins&outline_colour=000000&coffee_colour=ffffff" alt="Buy Me a Drink"> </a> </p>
+<!-- Buy Me A Drink (SVG button stored in ./.static/buymeacoffee.svg) --> <p align="center"> <a href="https://www.buymeacoffee.com/craigcogdey" target="_blank" rel="noopener noreferrer" aria-label="Buy me a drink"> <img src="./.static/buymeacoffee.svg" alt="Buy Me a Drink" width="220" style="max-height:72px;"> </a> </p>
