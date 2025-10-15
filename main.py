@@ -26,7 +26,8 @@ import signal
 import threading
 from coordinator import Coordinator
 from web_ui import run_web_server
-from config import GENERAL_SETTINGS, TARGET_FREQUENCIES
+from config import GENERAL_SETTINGS, TARGET_FREQUENCIES, SCANNER_DEVICE_INDEX, JAMMER_DEVICE_INDEX
+from scanner import init_database
 
 # Set up logging
 logging.basicConfig(
@@ -54,15 +55,15 @@ def parse_arguments():
     parser.add_argument(
         '--scanner-index', 
         type=int, 
-        default=0,
-        help='HackRF device index for scanner (default: 0)'
+        default=SCANNER_DEVICE_INDEX,
+        help=f'HackRF device index for scanner (default: {SCANNER_DEVICE_INDEX})'
     )
     
     parser.add_argument(
         '--jammer-index', 
         type=int, 
-        default=1,
-        help='HackRF device index for jammer (default: 1)'
+        default=JAMMER_DEVICE_INDEX,
+        help=f'HackRF device index for jammer (default: {JAMMER_DEVICE_INDEX})'
     )
     
     parser.add_argument(
@@ -98,6 +99,12 @@ def parse_arguments():
         default=GENERAL_SETTINGS['log_level'],
         help='Logging level (default: INFO)'
     )
+
+    parser.add_argument(
+        '--jam',
+        action='store_true',
+        help='Enable the jammer. Use with extreme caution and only for legal purposes.'
+    )
     
     return parser.parse_args()
 
@@ -124,6 +131,11 @@ def print_banner():
     ║    - Adaptive jamming                                     ║
     ║                                                           ║
     ╚═══════════════════════════════════════════════════════════╝
+
+    WARNING: The use of this software for jamming or interfering with radio
+    communications is illegal in most countries. This project is intended for
+    educational and research purposes only. Users are solely responsible for
+    complying with all applicable laws and regulations in their jurisdiction.
     """
     print(banner)
 
@@ -170,13 +182,17 @@ def main():
     logging.getLogger('').setLevel(getattr(logging, args.log_level))
     
     print_banner()
+
+    # Initialize the database
+    init_database()
     
     # Create coordinator
     coordinator = Coordinator(
         scanner_device_index=args.scanner_index,
         jammer_device_index=args.jammer_index,
         attack_mode=args.attack_mode,
-        simulation=args.simulate
+        simulation=args.simulate,
+        jam=args.jam
     )
     
     # Set scan mode if specified
@@ -210,11 +226,8 @@ def main():
         
         # Main loop now just keeps the program alive
         while True:
-            print_status(coordinator)
-            time.sleep(5)  # Update status every 5 seconds
-            
-            # Clear screen for next update
-            os.system('cls' if os.name == 'nt' else 'clear')
+            # The web UI provides real-time status, so we can sleep here
+            time.sleep(10)
             
     except KeyboardInterrupt:
         print("\nShutting down reactive jammer...")

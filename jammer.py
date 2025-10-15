@@ -8,7 +8,7 @@ import time
 import logging
 import threading
 import hackrf
-from config import HACKRF_SETTINGS
+from config import HACKRF_SETTINGS, JAMMER_SETTINGS
 
 # Set up logging
 logging.basicConfig(
@@ -21,14 +21,17 @@ logger = logging.getLogger('jammer')
 class Jammer:
     """HackRF jammer for transmitting signals on target frequencies."""
     
-    def __init__(self, device_index=1, simulation=False):
+    def __init__(self, device_index=1, simulation=False, simulation_state=None):
         """Initialize the jammer with the specified HackRF device."""
         self.device_index = device_index
         self.device = None
         self.simulation = simulation
-        self.sample_rate = HACKRF_SETTINGS['jammer']['sample_rate']
-        self.gain = HACKRF_SETTINGS['jammer']['gain']
-        self.amplitude = HACKRF_SETTINGS['jammer']['amplitude']
+        self.simulation_state = simulation_state
+
+        device_settings = HACKRF_SETTINGS[self.device_index]
+        self.sample_rate = device_settings['sample_rate']
+        self.txvga_gain = device_settings['txvga_gain']
+        self.amplitude = JAMMER_SETTINGS['amplitude']
         
         # Jamming state
         self.current_freq = None
@@ -38,6 +41,18 @@ class Jammer:
         
         logger.info("Jammer initialized")
     
+    def apply_settings(self, hackrf_settings):
+        """Apply new settings to the jammer."""
+        self.sample_rate = hackrf_settings['sample_rate']
+        self.gain = hackrf_settings['gain']
+        self.amplitude = hackrf_settings['amplitude']
+
+        if self.device:
+            self.device.sample_rate = self.sample_rate
+            self.device.txvga_gain = self.gain
+        
+        logger.info("Jammer settings updated")
+
     def start(self):
         """Start the jammer device."""
         if self.simulation:
@@ -70,6 +85,12 @@ class Jammer:
         
         self.current_freq = freq
         self.current_bandwidth = bandwidth or 1.0  # Default 1 MHz bandwidth
+
+        if self.simulation:
+            self.simulation_state.update_jammer(True, self.current_freq, self.current_bandwidth)
+            self.jamming = True
+            logger.info(f"(SIM) Started jamming at {freq} MHz")
+            return True
         
         try:
             # Set center frequency in Hz
@@ -91,6 +112,14 @@ class Jammer:
     def stop_jamming(self):
         """Stop the current jamming operation."""
         if not self.jamming:
+            return
+
+        if self.simulation:
+            self.simulation_state.update_jammer(False, 0, 0)
+            self.jamming = False
+            logger.info(f"(SIM) Stopped jamming at {self.current_freq} MHz")
+            self.current_freq = None
+            self.current_bandwidth = None
             return
         
         self.jamming = False
@@ -164,7 +193,14 @@ class Jammer:
 
         self.current_freq = f"{start_freq}-{end_freq}"  # Store the range
         self.jamming = True
-        
+
+        if self.simulation:
+            center_freq = (start_freq + end_freq) / 2
+            bandwidth = end_freq - start_freq
+            self.simulation_state.update_jammer(True, center_freq, bandwidth)
+            logger.info(f"(SIM) Started wide-band jamming from {start_freq} to {end_freq} MHz")
+            return True
+
         self.jam_thread = threading.Thread(
             target=self._wideband_jam_loop,
             args=(start_freq, end_freq)
