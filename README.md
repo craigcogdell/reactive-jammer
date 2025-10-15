@@ -5,7 +5,7 @@
     ║                                                           ║
     ║               REACTIVE JAMMER SYSTEM                      ║
     ║                                                           ║
-    ║  Scan - Detect - Jam - Adapt                             ║
+    ║  Scan - Detect - Jam - Adapt                              ║
     ║                                                           ║
     ╚═══════════════════════════════════════════════════════════╝
 </pre>
