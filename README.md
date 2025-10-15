@@ -1,21 +1,3 @@
-<!-- Hero image section -->
-<p align="center">
-  <img src="./static/hero.png" alt="Reactive Jammer Hero" width="100%" style="max-height:360px; object-fit:cover;">
-</p>
-
-<h1 align="center">Reactive Jammer</h1>
-
-<p align="center">
-  <em>Reactive Jammer using two HackRF SDR radios with a GUI interface</em>
-</p>
-
-<p align="center">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg">
-  <img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-green.svg">
-  <img alt="Status" src="https://img.shields.io/badge/status-Active-success.svg">
-</p>
-
-
 # Reactive Jammer System
 
 <pre>
@@ -23,10 +5,14 @@
     ║                                                           ║
     ║               REACTIVE JAMMER SYSTEM                      ║
     ║                                                           ║
-    ║  Scan - Detect - Jam - Adapt                              ║
+    ║  Scan - Detect - Jam - Adapt                             ║
     ║                                                           ║
     ╚═══════════════════════════════════════════════════════════╝
 </pre>
+
+## Legal Disclaimer
+
+**WARNING: The use of this software for jamming or interfering with radio communications is illegal in most countries.** This project is intended for educational and research purposes only. Users are solely responsible for complying with all applicable laws and regulations in their jurisdiction. The developers of this project do not condone any illegal use of this software and are not responsible for any damages or legal issues that may arise from its use.
 
 ## Overview
 
@@ -155,9 +141,3 @@ This project is designed to be modular and extensible.
 ## Contributing
 
 Developers are more than welcome to help develop this into a more robust and advanced system. Feel free to fork the project, create feature branches, and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
-
-## Notice
-
-The Reactive Jammer is a brilliant concept — I don't yet have the two HackRFs needed to test it, so it may have issues. I'll be spending more time building the system; for now let's class it as a prototype. If anyone is interested in helping develop this into a real-world, lab-safe application or wants to collaborate, please feel free to reach out. (Note: this work is intended for controlled, legal research/testing only.)
-
-<!-- Buy Me a Drink (hosted image version) --> <p align="center"> <a href="https://www.buymeacoffee.com/craigcogdey" target="_blank" rel="noopener noreferrer"> <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Drink" width="200" style="border-radius: 8px;"> </a> </p>

@@ -38,6 +38,7 @@ class DetectedFrequency(Base):
     last_seen = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     detection_count = Column(Integer, default=1)
     hop_count = Column(Integer, default=0)
+    threat_score = Column(Float, default=0.0, index=True)
 
     def __repr__(self):
         return f"<DetectedFrequency(freq={self.center_freq:.3f} MHz, power={self.power:.1f} dBm)>"
@@ -55,35 +56,60 @@ class HopTransition(Base):
     def __repr__(self):
         return f"<HopTransition({self.source_freq:.2f} -> {self.dest_freq:.2f}, count={self.count})>"
 
+def init_database():
+    """Create the database and tables if they don't exist."""
+    engine = create_engine(f"sqlite:///{DATABASE_SETTINGS['db_file']}")
+    Base.metadata.create_all(engine)
+    logger.info("Database initialized.")
+
 class Scanner:
     """HackRF scanner for detecting signals."""
     
-    def __init__(self, device_index=0, simulation=False):
+    def __init__(self, device_index=0, simulation=False, db_queue=None, simulation_state=None):
         """Initialize the scanner with the specified HackRF device."""
         self.device_index = device_index
         self.device = None
         self.simulation = simulation
+        self.db_queue = db_queue
+        self.simulation_state = simulation_state
         
         # Load settings from config
-        self.sample_rate = HACKRF_SETTINGS['scanner']['sample_rate']
-        self.if_gain = HACKRF_SETTINGS['scanner']['if_gain']
-        self.bb_gain = HACKRF_SETTINGS['scanner']['bb_gain']
+        device_settings = HACKRF_SETTINGS[self.device_index]
+        self.sample_rate = device_settings['sample_rate']
+        self.lna_gain = device_settings['lna_gain']
+        self.vga_gain = device_settings['vga_gain']
         self.fft_size = SCANNER_SETTINGS['fft_size']
         self.integration_time = SCANNER_SETTINGS['integration_time']
         self.threshold = SCANNER_SETTINGS['threshold']
+        self.last_scan_data = None
         
         # Database connection
         self.engine = create_engine(f"sqlite:///{DATABASE_SETTINGS['db_file']}")
-        Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
         
         logger.info("Scanner initialized")
+
+    def apply_settings(self, hackrf_settings, scanner_settings):
+        """Apply new settings to the scanner."""
+        self.sample_rate = hackrf_settings['sample_rate']
+        self.if_gain = hackrf_settings['if_gain']
+        self.bb_gain = hackrf_settings['bb_gain']
+        self.fft_size = scanner_settings['fft_size']
+        self.integration_time = scanner_settings['integration_time']
+        self.threshold = scanner_settings['threshold']
+
+        if self.device:
+            self.device.sample_rate = self.sample_rate
+            self.device.lna_gain = self.if_gain
+            self.device.vga_gain = self.bb_gain
+        
+        logger.info("Scanner settings updated")
 
     def start(self):
         """Start the scanner device."""
         if self.simulation:
             from fake_hackrf import FakeHackRF
-            self.device = FakeHackRF()
+            self.device = FakeHackRF(device_index=self.device_index, simulation_state=self.simulation_state)
             logger.info("Scanner started in simulation mode.")
             return True
 
@@ -132,8 +158,18 @@ class Scanner:
             psd_db = 10 * np.log10(psd)
             psd_db = np.fft.fftshift(psd_db)
             freqs = np.fft.fftshift(freqs)
+
+            # Store for web UI
+            self.last_scan_data = {
+                'frequencies': (freqs + center_freq * 1e6).tolist(),
+                'psd': psd_db.tolist()
+            }
             
-            peaks, properties = find_peaks(psd_db, height=self.threshold)
+            # Dynamic threshold based on noise floor
+            noise_floor = np.median(psd_db)
+            dynamic_threshold = noise_floor + self.threshold
+
+            peaks, properties = find_peaks(psd_db, height=dynamic_threshold)
             
             if len(peaks) == 0:
                 return None
@@ -175,43 +211,11 @@ class Scanner:
                 'timestamp': datetime.datetime.utcnow()
             }
             
-            self._store_detection(signal_info)
             return signal_info
             
         except Exception as e:
             logger.error(f"Error scanning at {center_freq} MHz: {e}")
             return None
-
-    def _store_detection(self, signal_info):
-        """Store a detected frequency in the database."""
-        session = self.Session()
-        try:
-            existing = session.query(DetectedFrequency).filter(
-                DetectedFrequency.center_freq.between(
-                    signal_info['center_freq'] - 0.1,
-                    signal_info['center_freq'] + 0.1
-                )
-            ).first()
-            
-            if existing:
-                existing.last_seen = signal_info['timestamp']
-                existing.power = signal_info['power']
-                existing.detection_count += 1
-            else:
-                new_freq = DetectedFrequency(
-                    center_freq=signal_info['center_freq'],
-                    bandwidth=signal_info['bandwidth'],
-                    power=signal_info['power'],
-                    band_name=signal_info['band_name']
-                )
-                session.add(new_freq)
-            
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Database error storing detection: {e}")
-        finally:
-            session.close()
 
     def get_detected_frequencies(self, limit=10):
         """Get the most recently detected frequencies."""
@@ -232,6 +236,10 @@ class Scanner:
             ).order_by(DetectedFrequency.last_seen.desc()).limit(limit).all()
         finally:
             session.close()
+
+    def get_last_scan_data(self):
+        """Return the last captured spectrum data."""
+        return self.last_scan_data
 
     def is_connected(self):
         """Check if the scanner device is connected."""
