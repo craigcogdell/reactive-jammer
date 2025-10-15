@@ -30,23 +30,34 @@ TARGET_FREQUENCIES = {
     "MICROWAVE_OVEN": {"start": 2450.0, "end": 2460.0, "description": "Microwave Oven Leakage"}
 }
 
-# HackRF device settings
-HACKRF_SETTINGS = {
-    "scanner": {
-        "sample_rate": 20e6,  # 20 MHz sample rate
-        "gain": 40,           # RF gain
-        "if_gain": 40,        # IF gain
-        "bb_gain": 40,        # Baseband gain
-        "freq_correction": 0  # Frequency correction in ppm
+# Device indices
+SCANNER_DEVICE_INDEX = 0
+JAMMER_DEVICE_INDEX = 1
+
+# HackRF device settings - now a list
+HACKRF_SETTINGS = [
+    # Device 0 (Scanner)
+    {
+        "sample_rate": 20e6,
+        "lna_gain": 32,
+        "vga_gain": 28,
+        "txvga_gain": 0, # Not used for scanning
+        "freq_correction": 0
     },
-    "jammer": {
-        "sample_rate": 20e6,  # 20 MHz sample rate
-        "gain": 47,           # RF gain (max for transmission)
-        "if_gain": 47,        # IF gain (max for transmission)
-        "bb_gain": 47,        # Baseband gain (max for transmission)
-        "freq_correction": 0, # Frequency correction in ppm
-        "amplitude": 0.9      # Amplitude of jamming signal (0.0-1.0)
+    # Device 1 (Jammer)
+    {
+        "sample_rate": 20e6,
+        "lna_gain": 0, # Not used for jamming
+        "vga_gain": 0, # Not used for jamming
+        "txvga_gain": 47, # Max for transmission
+        "freq_correction": 0
     }
+]
+
+# Jammer-specific settings
+JAMMER_SETTINGS = {
+    "amplitude": 0.9, # Amplitude of jamming signal (0.0-1.0)
+    "attack_mode": "targeted" # Options: targeted, wide_band
 }
 
 # Scanner settings
