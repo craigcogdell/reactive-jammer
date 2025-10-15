@@ -5,7 +5,7 @@
     ║                                                           ║
     ║               REACTIVE JAMMER SYSTEM                      ║
     ║                                                           ║
-    ║  Scan - Detect - Jam - Adapt                              ║
+    ║  Scan - Detect - Jam - Adapt                             ║
     ║                                                           ║
     ╚═══════════════════════════════════════════════════════════╝
 </pre>
@@ -16,19 +16,33 @@
 
 ## Overview
 
-The Reactive Jammer System is a sophisticated SDR (Software-Defined Radio) application designed for detecting and neutralizing radio frequency signals in real-time. It uses one SDR for scanning the spectrum and a second for targeted jamming. The system is equipped with a web-based user interface for monitoring and control, predictive algorithms for tracking frequency-hopping signals, and multiple attack modes.
+The Reactive Jammer System is a sophisticated, next-generation SDR (Software-Defined Radio) application designed for intelligent, real-time detection and neutralization of radio frequency signals. It uses one SDR for scanning and a second for jamming, orchestrated by a central coordinator with an intelligent targeting engine.
+
+The system is controlled through a comprehensive, redesigned web interface that provides real-time data visualization, dynamic system control, and direct terminal access. Its new simulation engine allows for robust testing of all features without any hardware.
 
 ## Key Features
 
-- **Dual SDR Operation:** Utilizes two separate SDRs for simultaneous scanning and jamming, ensuring no interruption in detection.
-- **Multiple Attack Modes:**
-    - **Targeted Attack:** Reactively detects, analyzes, and jams specific, active signals.
-    - **Wide-Band Attack:** Proactively jams an entire frequency band with a sweeping noise signal.
+- **Intelligent Targeting Engine:** The system no longer just jams the first or strongest signal. A new **Threat Score** system analyzes and prioritizes all detected signals based on power, persistence, and hopping behavior, ensuring the jammer is always focused on the most significant threat.
+
+- **Redesigned Web Interface (Bootstrap 5):** The UI has been completely overhauled for a modern, responsive, and more intuitive user experience.
+
+- **Advanced Dynamic Controls:**
+    - **Interactive Targeting:** Click any signal in the "Detected Signals" list to immediately jam it.
+    - **Dynamic Mode Switching:** Change the Attack Mode (Targeted, Wide-Band) and Scan Mode (Priority, Sequential, Random) on the fly without a restart.
+    - **Live Band Selection:** Interactively select and de-select which frequency bands are actively scanned.
+    - **Manual Wide-Band Attack:** Choose any band from a dropdown and instantly launch a wide-band attack.
+
+- **Thorough Scanning:** The scanning algorithm has been upgraded from a sparse check to a continuous sweep, ensuring no signals are missed within a targeted band.
+
+- **Interactive Web Terminal:** An integrated, full-featured terminal (Xterm.js) in the web UI provides direct shell access to the host machine for advanced users.
+
+- **Dynamic Simulation Mode:** The `--simulate` flag now launches a high-fidelity simulation.
+    - A `SignalGenerator` creates a dynamic RF environment with multiple signals, including frequency hoppers.
+    - The simulation provides a **closed-loop feedback system**: jamming a signal in the UI will cause it to disappear from the spectrum analyzer, visually confirming the system is working.
+
 - **Predictive Frequency Hopping:** Records and analyzes hopping patterns to predict a signal's next frequency, allowing for near-instantaneous re-acquisition and jamming.
-- **Web-Based UI:** A comprehensive dashboard accessible at `http://localhost:5000` for real-time monitoring of system status, device connections, detected signals, and active jamming targets.
-- **Interactive Web Terminal:** An integrated, full-featured terminal in the web UI provides direct shell access to the host machine for advanced users.
-- **Simulation Mode:** Run the entire application without any hardware using the `--simulate` flag. Perfect for development, testing, and demonstration.
-- **Extensive Frequency Database:** Comes pre-configured with a wide range of common frequency bands, including ISM, WiFi, Cellular (5G/LTE), GPS, and more.
+
+- **Extensive Frequency Database:** Comes pre-configured with a wide range of common frequency bands, including IoT (915/868/433 MHz), WiFi, Cellular (5G/LTE), GPS, and more.
 
 ## System & Hardware Requirements
 
